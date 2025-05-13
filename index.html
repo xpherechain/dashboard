@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>xp_getTotalSupply | X-Phere Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      min-height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #0f2027 0%, #2c5364 100%);
+      font-family: 'Inter', Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 8px 32px 0 rgba(44,83,100,0.18), 0 1.5px 6px 0 rgba(44,83,100,0.10);
+      padding: 2.5rem 2rem 2rem 2rem;
+      max-width: 900px;
+      width: 100%;
+      margin: 2rem;
+      text-align: center;
+      position: relative;
+      animation: fadeIn 1s;
+      box-sizing: border-box;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(30px);}
+      to { opacity: 1; transform: none;}
+    }
+    .logo {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 0.5rem;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #2c5364 0%, #0f2027 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 2px 8px rgba(44,83,100,0.10);
+    }
+    .logo svg {
+      width: 32px;
+      height: 32px;
+      fill: #fff;
+    }
+    h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #2c5364;
+      margin: 0.2em 0 0.1em 0;
+      letter-spacing: -1px;
+    }
+    .subtitle {
+      color: #4a6fa1;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 2em;
+      margin-top: 0.2em;
+      letter-spacing: 0.01em;
+    }
+    .dashboard-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      margin-top: 1.5em;
+      margin-bottom: 1.5em;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .metric-card {
+      background: linear-gradient(120deg, #f7fafc 60%, #e3eaf6 100%);
+      border-radius: 16px;
+      box-shadow: 0 2px 8px rgba(44,83,100,0.07);
+      padding: 1.3em 1.5em 1.1em 1.5em;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+      box-sizing: border-box;
+      position: relative;
+      transition: transform 0.12s, box-shadow 0.12s;
+      border: 1.5px solid #e3eaf6;
+      margin: 0;
+      max-width: 100%;
+    }
+    .metric-card.flash {
+      animation: flash 0.8s;
+      box-shadow: 0 0 0 4px #ffe066, 0 2px 8px rgba(44,83,100,0.07);
+      border-color: #ffe066;
+      z-index: 1;
+    }
+    @keyframes flash {
+      0%   { background: #fffbe6; }
+      60%  { background: #fffbe6; }
+      100% { background: linear-gradient(120deg, #f7fafc 60%, #e3eaf6 100%);}
+    }
+    .metric-label {
+      font-size: 1.08em;
+      font-weight: 700;
+      color: #2c5364;
+      margin-bottom: 0.3em;
+      display: flex;
+      align-items: center;
+      gap: 0.4em;
+    }
+    .metric-icon {
+      width: 1.2em;
+      height: 1.2em;
+      vertical-align: middle;
+      opacity: 0.7;
+    }
+    .metric-dec {
+      font-size: 1.25em;
+      font-weight: 800;
+      color: #1a3a5d;
+      margin-bottom: 0.15em;
+      word-break: break-all;
+    }
+    .loader {
+      border: 4px solid #e3eaf6;
+      border-top: 4px solid #2c5364;
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin: 2em 0;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg);}
+      100% { transform: rotate(360deg);}
+    }
+    #error {
+      color: #c0392b;
+      margin-top: 1.5em;
+      font-weight: 600;
+      font-size: 1.08em;
+      background: #ffeaea;
+      border-radius: 8px;
+      padding: 0.7em 1em;
+      display: inline-block;
+    }
+    @media (max-width: 900px) {
+      .container { max-width: 99vw; }
+    }
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.2rem 0.2rem 1.5rem 0.2rem;
+        max-width: 100vw;
+      }
+      h1 { font-size: 1.3rem; }
+      .subtitle { font-size: 0.98rem; }
+      .dashboard-grid { gap: 0.7rem; }
+      .metric-card { padding: 1em 0.5em 0.9em 0.7em; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">
+      <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#2c5364"/><text x="16" y="21" text-anchor="middle" font-size="15" fill="#fff" font-family="Arial" font-weight="bold">XP</text></svg>
+    </div>
+    <h1>xp_getTotalSupply</h1>
+    <div class="subtitle">X-Phere Blockchain Total Supply & Burn Dashboard</div>
+    <div id="supply"><span class="loader"></span></div>
+    <div id="error"></div>
+  </div>
+  <script>
+    const endpoint = "https://en-bkk.x-phere.com/";
+    const payload = {
+      jsonrpc: "2.0",
+      method: "xp_getTotalSupply",
+      params: ["latest"],
+      id: 1
+    };
+
+    function hexToDec(hex) {
+      if (!hex) return "";
+      if (hex.startsWith("0x") || hex.startsWith("0X")) {
+        hex = hex.slice(2);
+      }
+      try {
+        return BigInt("0x" + hex);
+      } catch {
+        return "";
+      }
+    }
+
+    // Format BigInt as decimal with 18 decimals and commas
+    function formatDecimal18(bigint) {
+      if (typeof bigint !== "bigint") return "";
+      const DECIMALS = 18n;
+      const divisor = 10n ** DECIMALS;
+      const intPart = bigint / divisor;
+      let fracPart = (bigint % divisor).toString().padStart(18, "0");
+      // Remove trailing zeros in fractional part, but keep at least 2 decimals
+      fracPart = fracPart.replace(/0+$/, "");
+      if (fracPart.length < 2) fracPart = fracPart.padEnd(2, "0");
+      return intPart.toLocaleString() + "." + fracPart;
+    }
+
+    // Format BigInt as integer with commas
+    function formatInt(bigint) {
+      if (typeof bigint !== "bigint") return "";
+      return bigint.toLocaleString();
+    }
+
+    function getMetricIcon(key) {
+      switch (key) {
+        case "number":
+          return '<svg class="metric-icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="9" fill="#4a6fa1"/><text x="10" y="14" text-anchor="middle" font-size="10" fill="#fff" font-family="Arial" font-weight="bold">#</text></svg>';
+        case "totalSupply":
+          return '<svg class="metric-icon" viewBox="0 0 20 20"><rect x="3" y="6" width="14" height="8" rx="3" fill="#2c5364"/><circle cx="10" cy="10" r="4" fill="#4a6fa1"/></svg>';
+        case "totalMinted":
+          return '<svg class="metric-icon" viewBox="0 0 20 20"><rect x="4" y="4" width="12" height="12" rx="4" fill="#4a6fa1"/><path d="M10 6v4l3 2" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg>';
+        case "totalBurnt":
+          return '<svg class="metric-icon" viewBox="0 0 20 20"><path d="M10 3C10 3 7 7 10 11C13 7 10 3 10 3Z" fill="#c0392b"/><ellipse cx="10" cy="14" rx="4" ry="3" fill="#e3eaf6"/></svg>';
+        case "burntFee":
+          return '<svg class="metric-icon" viewBox="0 0 20 20"><rect x="5" y="5" width="10" height="10" rx="3" fill="#c0392b"/><text x="10" y="13" text-anchor="middle" font-size="7" fill="#fff" font-family="Arial" font-weight="bold">%</text></svg>';
+        case "zeroBurn":
+          return '<svg class="metric-icon" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#e3eaf6"/><text x="10" y="14" text-anchor="middle" font-size="10" fill="#4a6fa1" font-family="Arial" font-weight="bold">0</text></svg>';
+        case "deadBurn":
+          return '<svg class="metric-icon" viewBox="0 0 20 20"><rect x="3" y="8" width="14" height="4" rx="2" fill="#2c5364"/><rect x="8" y="3" width="4" height="14" rx="2" fill="#4a6fa1"/></svg>';
+        default:
+          return "";
+      }
+    }
+
+    // The offset to subtract for totalMinted, totalBurnt, deadBurn
+    const OFFSET = 400000000000000000000000000000000000000000000000000n;
+
+    const fields = [
+      { key: "number", label: "Block Number", decimal18: false },
+      { key: "totalSupply", label: "Total Supply", decimal18: true },
+      { key: "totalMinted", label: "Total Minted", decimal18: true, offset: true },
+      { key: "totalBurnt", label: "Total Burnt", decimal18: true, offset: true },
+      { key: "burntFee", label: "Burnt Fee", decimal18: true },
+      { key: "zeroBurn", label: "Zero Burn", decimal18: true },
+      { key: "deadBurn", label: "Dead Burn", decimal18: true, offset: true }
+    ];
+
+    let previousResult = {};
+
+    function renderDashboard(result, changedKeys = []) {
+      let html = '<div class="dashboard-grid">';
+      for (const field of fields) {
+        const hex = result[field.key] || "";
+        let bigint = hexToDec(hex);
+        if (field.offset && typeof bigint === "bigint") {
+          bigint = bigint - OFFSET;
+          if (bigint < 0n) bigint = 0n;
+        }
+        let dec = "";
+        if (field.decimal18) {
+          dec = formatDecimal18(bigint);
+        } else {
+          dec = formatInt(bigint);
+        }
+        const flashClass = changedKeys.includes(field.key) ? "flash" : "";
+        html += `<div class="metric-card ${flashClass}" id="metric-${field.key}">
+          <div class="metric-label">${getMetricIcon(field.key)}${field.label}</div>
+          <div class="metric-dec">${dec}</div>
+        </div>`;
+      }
+      html += "</div>";
+      return html;
+    }
+
+    function getChangedKeys(prev, curr) {
+      const changed = [];
+      for (const field of fields) {
+        if ((prev && prev[field.key]) !== (curr && curr[field.key])) {
+          changed.push(field.key);
+        }
+      }
+      return changed;
+    }
+
+    async function fetchAndRender() {
+      document.getElementById("error").textContent = "";
+      try {
+        const res = await fetch(endpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("Network error: " + res.status);
+        const data = await res.json();
+        if (data.result && typeof data.result === "object") {
+          const changedKeys = getChangedKeys(previousResult, data.result);
+          document.getElementById("supply").innerHTML = renderDashboard(data.result, changedKeys);
+          previousResult = data.result;
+          // Remove flash class after animation
+          if (changedKeys.length > 0) {
+            setTimeout(() => {
+              for (const key of changedKeys) {
+                const el = document.getElementById("metric-" + key);
+                if (el) el.classList.remove("flash");
+              }
+            }, 800);
+          }
+        } else if (data.error) {
+          document.getElementById("supply").textContent = "";
+          document.getElementById("error").textContent = "Error: " + JSON.stringify(data.error);
+        } else {
+          document.getElementById("supply").textContent = "";
+          document.getElementById("error").textContent = "Unexpected response: " + JSON.stringify(data);
+        }
+      } catch (e) {
+        document.getElementById("supply").textContent = "";
+        document.getElementById("error").textContent = "Fetch error: " + e.message;
+      }
+    }
+
+    // Initial load
+    document.getElementById("supply").innerHTML = '<span class="loader"></span>';
+    fetchAndRender();
+    setInterval(fetchAndRender, 1500);
+  </script>
+</body>
+</html>
